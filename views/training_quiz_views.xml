@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="training_quiz_view_tree" model="ir.ui.view">
+        <field name="name">training.quiz.tree</field>
+        <field name="model">training.quiz</field>
+        <field name="arch" type="xml">
+            <tree string="Evaluaciones de Simulador">
+                <field name="sequence" widget="handle"/>
+                <field name="student_name"/>
+                <field name="course_id"/>
+                <field name="final_average" avg="Promedio General"/>
+                <field name="state" widget="badge" decoration-success="state == 'pass'" decoration-danger="state == 'fail'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="training_quiz_form" model="ir.ui.view">
+        <field name="name">training.quiz.form</field>
+        <field name="model">training.quiz</field>
+        <field name="arch" type="xml">
+            <form string="Simulador de Calificación">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="fail,pass"/>
+                </header>
+                <sheet class="o_form_sheet_full_width">
+                    
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-7">
+                            <div class="oe_title">
+                                <label for="student_name" class="oe_edit_only" string="Nombre del Estudiante a Calificar"/>
+                                <h1 class="w-100">
+                                    <field name="student_name" placeholder="Ej. Carlos Mendoza" class="w-100"/>
+                                </h1>
+                            </div>
+                        </div>
+                        <div class="col-md-5" style="border-left: 2px solid #0056b3; padding-left: 20px;">
+                            <group class="m-0 p-0">
+                                <field name="course_id" options="{'no_create': True}"/>
+                                <field name="sequence" groups="base.group_no_one"/>
+                            </group>
+                        </div>
+                    </div>
+
+                    <separator string="Caso de Estudio / Evidencia de Rendimiento"/>
+                    <div class="mb-4">
+                        <field name="case_description" placeholder="Redacte aquí las acciones, entregas o faltas del estudiante para que el usuario pueda ponderar basándose en criterios reales..." style="min-height: 100px;"/>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6" style="border-right: 1px solid #dee2e6; padding-right: 30px;">
+                            <h3 class="text-primary mb-3" style="border-bottom: 2px solid #efefef; padding-bottom: 8px;">
+                                Ponderaciones (Rango: 0 - 20)
+                            </h3>
+                            <group class="mt-2">
+                                <label for="score_a1"/>
+                                <div class="o_row">
+                                    <field name="score_a1" class="oe_inline"/>
+                                    <field name="status_a1" nolabel="1" class="oe_inline"/>
+                                </div>
+
+                                <label for="score_a2"/>
+                                <div class="o_row">
+                                    <field name="score_a2" class="oe_inline"/>
+                                    <field name="status_a2" nolabel="1" class="oe_inline"/>
+                                </div>
+
+                                <label for="score_a3"/>
+                                <div class="o_row">
+                                    <field name="score_a3" class="oe_inline"/>
+                                    <field name="status_a3" nolabel="1" class="oe_inline"/>
+                                </div>
+
+                                <label for="score_a4"/>
+                                <div class="o_row">
+                                    <field name="score_a4" class="oe_inline"/>
+                                    <field name="status_a4" nolabel="1" class="oe_inline"/>
+                                </div>
+
+                                <label for="score_a5"/>
+                                <div class="o_row">
+                                    <field name="score_a5" class="oe_inline"/>
+                                    <field name="status_a5" nolabel="1" class="oe_inline"/>
+                                </div>
+                            </group>
+                        </div>
+
+                        <div class="col-lg-6 d-flex flex-column justify-content-center" style="padding-left: 40px; padding-right: 20px;">
+                            <div class="card p-4 text-center shadow-sm w-100" style="background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e3e6f0;">
+                                <h4 class="text-muted font-weight-bold letter-spacing-1">RESULTADO DE LA PRUEBA</h4>
+                                <hr class="my-3"/>
+                                
+                                <div class="my-3">
+                                    <span style="font-size: 1.3rem; font-weight: bold; color: #6c757d; display: block; margin-bottom: 5px;">PROMEDIO:</span>
+                                    <div style="font-size: 4.5rem; font-weight: 900; color: #1a1a1a; line-height: 1;">
+                                        <field name="final_average" readonly="1"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <field name="state" invisible="1"/>
+                                    <h2 attrs="{'invisible': [('state', '!=', 'pass')]}" style="color: #28a745; font-weight: bold; font-size: 2rem;">
+                                        ✅ ESTUDIANTE APROBADO
+                                    </h2>
+                                    <h2 attrs="{'invisible': [('state', '!=', 'fail')]}" style="color: #dc3545; font-weight: bold; font-size: 2rem;">
+                                        ❌ ESTUDIANTE DESAPROBADO
+                                    </h2>
+                                    <p class="text-muted small mt-3 font-italic" style="font-size: 0.95rem;">Nota mínima requerida para aprobar: 12.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
