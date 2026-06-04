@@ -10,66 +10,52 @@
                     <field name="file_url" invisible="1"/>
 
                     <group>
-                        <field name="name"/>
-                        <field name="course_id"/>
-                        <field name="material_type"/>
-                        <field name="sequence"/>
+                        <group>
+                            <field name="name"/>
+                            <field name="course_id"/>
+                            <field name="material_type"/>
+                        </group>
+                        <group>
+                            <field name="file" filename="file_name" widget="binary"/>
+                            <field name="file_name" invisible="1"/>
+                            <field name="allow_download"/>
+                            <field name="duration"/>
+                            <field name="sequence"/>
+                        </group>
                     </group>
 
-                    <group>
-                        <field name="file" filename="file_name" widget="binary"/>
-                        <field name="file_name" invisible="1"/>
-                        <field name="allow_download"/>
-                        <field name="duration"/>
-                    </group>
-
-                    <field name="description"/>
+                    <field name="description" placeholder="Descripción del material..."/>
 
                     <field name="content_text"
                            attrs="{'invisible': [('material_type', '!=', 'text')]}"/>
 
                     <notebook attrs="{'invisible': [('material_type', '!=', 'video')]}">
                         <page string="Reproductor de Video">
-                            <div style="width: 100%; min-height: 530px; margin-top: 10px; background: #000; border-radius: 8px; overflow: hidden;">
-                                <div attrs="{'invisible': [('file_url', '=', False)]}" style="width: 100%; height: 100%;">
-                                    <video controls="controls" 
-                                           controlsList="nodownload"
-                                           preload="auto"
-                                           width="100%" 
-                                           height="500" 
-                                           style="display: block; object-fit: contain;"
-                                           t-att-src="file_url">
-                                        Tu navegador no soporta la reproducción de video nativa.
-                                    </video>
-                                </div>
-                                <div attrs="{'invisible': [('file_url', '!=', False)]}" 
-                                     style="color: #6c757d; text-align: center; padding: 60px 20px; border: 2px dashed #ccc; border-radius: 5px; background: #f8f9fa;">
-                                    <p attrs="{'invisible': [('file', '!=', False)]}">
-                                        ⚠️ <strong>Carga un archivo de Video</strong> para habilitar el reproductor.
-                                    </p>
-                                    <p attrs="{'invisible': ['|', ('file', '=', False), ('id', '!=', False)]}" style="color: #bc8500;">
-                                        💾 <strong>Guarda el registro</strong> para poder reproducir el video cargado.
-                                    </p>
-                                </div>
+                            <div style="min-height: 520px; margin-top: 15px;">
+                                <!-- El widget JS maneja el src dinámicamente, sin depender de t-att-src -->
+                                <field name="file"
+                                       widget="video_player"
+                                       nolabel="1"
+                                       style="width: 100%; display: block;"/>
                             </div>
                         </page>
                     </notebook>
 
                     <notebook attrs="{'invisible': [('material_type', '!=', 'audio')]}">
                         <page string="Reproductor de Audio">
-                            <div style="width: 100%; padding: 10px; margin-top: 10px;">
-                                <div attrs="{'invisible': [('file_url', '=', False)]}">
+                            <div style="width: 100%; margin-top: 15px;">
+                                <div attrs="{'invisible': [('file_url', '=', False)]}" style="padding: 10px 0;">
                                     <audio controls="controls" controlsList="nodownload" preload="auto" style="width: 100%; display: block;" t-att-src="file_url">
-                                        Tu navegador no soporta la reproducción de audio nativa.
+                                        El navegador no soporta la reproducción de audio nativa.
                                     </audio>
                                 </div>
                                 <div attrs="{'invisible': [('file_url', '!=', False)]}" 
-                                     style="color: #6c757d; text-align: center; padding: 30px 20px; border: 2px dashed #ccc; border-radius: 5px; background: #f8f9fa;">
+                                     style="color: #666666; text-align: center; padding: 40px 20px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
                                     <p attrs="{'invisible': [('file', '!=', False)]}">
-                                        ⚠️ <strong>Carga un archivo de Audio</strong> para habilitar el reproductor.
+                                        Por favor, cargue un archivo de audio para habilitar el reproductor.
                                     </p>
-                                    <p attrs="{'invisible': ['|', ('file', '=', False), ('id', '!=', False)]}" style="color: #bc8500;">
-                                        💾 <strong>Guarda el registro</strong> para poder reproducir el audio cargado.
+                                    <p attrs="{'invisible': ['|', ('file', '=', False), ('id', '!=', False)]}" style="color: #444444;">
+                                        Guarde el registro del curso para procesar y reproducir el audio adjunto.
                                     </p>
                                 </div>
                             </div>
@@ -77,8 +63,8 @@
                     </notebook>
 
                     <notebook attrs="{'invisible': [('material_type', '!=', 'pdf')]}">
-                        <page string="Visualización del Documento PDF">
-                            <div style="width: 100%; min-height: 750px; margin-top: 10px;">
+                        <page string="Visualización de Documento">
+                            <div style="width: 100%; min-height: 740px; margin-top: 15px;">
                                 <field name="file" 
                                        widget="pdf_viewer" 
                                        nolabel="1" 
@@ -86,12 +72,12 @@
                                        attrs="{'invisible': ['|', ('file', '=', False), ('id', '=', False)]}"/>
                                 
                                 <div attrs="{'invisible': [('file', '!=', False), ('id', '!=', False)]}" 
-                                     style="color: #6c757d; text-align: center; padding: 60px 20px; border: 2px dashed #ccc; border-radius: 5px; width: 100%; background: #f8f9fa;">
+                                     style="color: #666666; text-align: center; padding: 80px 20px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
                                     <p attrs="{'invisible': [('file', '!=', False)]}">
-                                        ⚠️ <strong>Carga un archivo PDF</strong> para habilitar la vista previa.
+                                        Por favor, cargue un archivo PDF para habilitar la vista previa del documento.
                                     </p>
-                                    <p attrs="{'invisible': ['|', ('file', '=', False), ('id', '!=', False)]}" style="color: #bc8500;">
-                                        💾 <strong>Guarda el registro</strong> para generar la vista previa de tu PDF cargado.
+                                    <p attrs="{'invisible': ['|', ('file', '=', False), ('id', '!=', False)]}" style="color: #444444;">
+                                        Guarde el registro del curso para generar la vista previa del documento PDF.
                                     </p>
                                 </div>
                             </div>

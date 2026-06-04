@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Vistas -->
     <record id="training_course_tree" model="ir.ui.view">
         <field name="name">training.course.tree</field>
         <field name="model">training.course</field>
@@ -19,11 +18,21 @@
         <field name="model">training.course</field>
         <field name="arch" type="xml">
             <form string="Curso">
+                <header>
+
+                    <button name="action_save_guide" 
+                            string="Guardar guía y actualizar multimedia" 
+                            type="object" 
+                            class="oe_highlight"/>
+                            
+                </header>
+
                 <sheet>
                     <group>
                         <field name="name"/>
                         <field name="description"/>
                     </group>
+                    
                     <notebook>
                         <page string="Materiales">
                             <field name="material_ids"/>
@@ -37,24 +46,20 @@
         </field>
     </record>
 
-    <!-- Acción -->
     <record id="training_course_action" model="ir.actions.act_window">
         <field name="name">Cursos de Capacitación</field>
         <field name="res_model">training.course</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- MENÚ EN LA BARRA SUPERIOR (más confiable) -->
-    <menuitem 
-        id="school_training_menu_root" 
-        name="Capacitación" 
-        sequence="10"/>
+    <menuitem id="school_training_menu_root" 
+              name="Capacitación" 
+              sequence="10"/>
 
-    <menuitem 
-        id="school_training_courses" 
-        name="Cursos" 
-        parent="school_training_menu_root" 
-        action="training_course_action"
-        sequence="5"/>
+    <menuitem id="school_training_courses" 
+              name="Cursos" 
+              parent="school_training_menu_root" 
+              action="training_course_action"
+              sequence="5"/>
 
 </odoo>

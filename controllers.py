@@ -1,35 +1,73 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 from odoo.http import request
-import io
 import base64
+import re
+
 
 class TrainingMaterialController(http.Controller):
 
     @http.route('/training/stream/<int:material_id>', type='http', auth='user')
     def stream_training_material(self, material_id, **kwargs):
-        """
-        Transmite archivos de video, audio y PDF usando el motor nativo de Odoo.
-        """
-        # Buscamos con sudo() para evitar restricciones de reglas de registro (Record Rules) durante la carga multimedia
         material = request.env['training.material'].sudo().browse(material_id)
-        
+
         if not material.exists() or not material.file:
             return request.not_found()
 
         try:
-            # Odoo guarda los binarios en Base64; el navegador necesita Bytes puros
             file_data = base64.b64decode(material.file)
         except Exception:
             return request.not_found()
 
-        # Envolvemos los bytes decodificados en un flujo de datos legible por Odoo
-        file_like = io.BytesIO(file_data)
-        filename = material.file_name or 'material_multimedia'
+        total_length = len(file_data)
+        filename = material.file_name or 'video.mp4'
 
-        # Dejar que Odoo maneje las cabeceras de rango, streaming por bloques y tipos MIME de forma nativa
-        return request.send_file(
-            file_like,
-            filename=filename,
-            as_attachment=False  # Crucial: 'False' para que se reproduzca en línea y no se autodescargue
-        )
+        # Detectar Content-Type
+        ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+        mime_map = {
+            'mp4':  'video/mp4',
+            'webm': 'video/webm',
+            'ogv':  'video/ogg',
+            'ogg':  'video/ogg',
+            'mov':  'video/quicktime',
+            'mp3':  'audio/mpeg',
+            'wav':  'audio/wav',
+            'm4a':  'audio/mp4',
+        }
+        content_type = mime_map.get(ext, 'application/octet-stream')
+
+        # Leer el header Range del request
+        range_header = request.httprequest.headers.get('Range', None)
+
+        if range_header:
+            # Parsear "bytes=start-end"
+            match = re.match(r'bytes=(\d+)-(\d*)', range_header)
+            if match:
+                start = int(match.group(1))
+                end   = int(match.group(2)) if match.group(2) else total_length - 1
+
+                # Validar rango
+                end = min(end, total_length - 1)
+                chunk = file_data[start:end + 1]
+                chunk_length = len(chunk)
+
+                headers = [
+                    ('Content-Type',   content_type),
+                    ('Content-Length', chunk_length),
+                    ('Content-Range',  f'bytes {start}-{end}/{total_length}'),
+                    ('Accept-Ranges',  'bytes'),
+                    ('Cache-Control',  'no-store'),
+                ]
+                # 206 Partial Content — clave para que el navegador reproduzca
+                response = request.make_response(chunk, headers=headers)
+                response.status_code = 206
+                return response
+
+        # Sin Range header → respuesta completa normal
+        headers = [
+            ('Content-Type',   content_type),
+            ('Content-Length', total_length),
+            ('Accept-Ranges',  'bytes'),   # avisa al navegador que soportamos Range
+            ('Cache-Control',  'no-store'),
+        ]
+        return request.make_response(file_data, headers=headers)

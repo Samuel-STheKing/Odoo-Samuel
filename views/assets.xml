@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="school_training_video_widget_js" model="ir.asset">
+        <field name="name">Video Player Widget JS</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">/school_training/static/src/js/video_player_widget.js</field>
+    </record>
+</odoo>

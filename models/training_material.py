@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
 class TrainingMaterial(models.Model):
@@ -29,7 +30,7 @@ class TrainingMaterial(models.Model):
         compute='_compute_file_url', 
         string='URL del Archivo', 
         compute_sudo=True,  # Fuerza el cálculo correcto de la URL sin problemas de permisos
-        store=False         # Al no guardarse en base de datos, se recalcula dinámicamente cada vez que abres el registro
+        store=False         # Al no guardarse en base de datos, se recalcula dinámicamente
     )
 
     content_text = fields.Html(string='Contenido (Texto/HTML)')

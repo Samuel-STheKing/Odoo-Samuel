@@ -13,6 +13,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/training_course_views.xml',
+        'views/assets.xml',  
         'views/training_material_views.xml',
         'views/training_quiz_views.xml',
     ],

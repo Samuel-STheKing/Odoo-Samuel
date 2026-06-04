@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
 class TrainingCourse(models.Model):
@@ -22,14 +23,29 @@ class TrainingCourse(models.Model):
             course.total_materials = len(course.material_ids)
             course.total_quizzes = len(course.quiz_ids)
 
-    # === NUEVO MÉTODO PARA PRECARGAR ESTUDIANTES ===
+    # === MÉTODO DEF INITIVO PARA GUARDAR Y REFRESCAR SIN DUPLICAR MIGA DE PAN ===
+    def action_save_guide(self):
+        """
+        Guarda los datos en base de datos y refresca la pantalla actual de forma
+        limpia usando el target 'main', evitando que se dupliquen las migas de pan.
+        """
+        self.ensure_one()
+        
+        # Retornamos una acción que recarga la misma vista del registro actual de forma nativa
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'main',  # Evita que se acumule el historial en las migas de pan
+        }
+
+    # === MÉTODO PARA PRECARGAR ESTUDIANTES ===
     @api.model
     def default_get(self, fields_list):
         res = super(TrainingCourse, self).default_get(fields_list)
         
-        # Verificamos si 'quiz_ids' está en la lista de campos solicitados por la vista
         if 'quiz_ids' in fields_list:
-            # Lista de nombres por defecto que deseas que aparezcan
             default_students = [
                 "Estudiante 1",
                 "Estudiante 2",
@@ -38,7 +54,6 @@ class TrainingCourse(models.Model):
                 "Estudiante 5"
             ]
             
-            # Usamos el comando ORM (0, 0, {valores}) para crear registros en el One2many de forma virtual
             quiz_lines = []
             for name in default_students:
                 quiz_lines.append((0, 0, {
@@ -50,7 +65,6 @@ class TrainingCourse(models.Model):
                     'score_a5': 0.0,
                 }))
             
-            # Asignamos las líneas calculadas al diccionario de valores por defecto
             res.update({
                 'quiz_ids': quiz_lines
             })
