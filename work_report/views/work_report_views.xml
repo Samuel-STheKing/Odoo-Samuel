@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="seq_work_report" model="ir.sequence">
+            <field name="name">Work Report</field>
+            <field name="code">work.report</field>
+            <field name="prefix">WR-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="implementation">no_gap</field>
+        </record>
+
+
+        <record id="view_work_area_tree" model="ir.ui.view">
+            <field name="name">work.area.tree</field>
+            <field name="model">work.area</field>
+            <field name="arch" type="xml">
+                <tree string="Áreas de Trabajo" editable="bottom">
+                    <field name="name"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_work_area" model="ir.actions.act_window">
+            <field name="name">Áreas de Trabajo</field>
+            <field name="res_model">work.area</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+
+        <record id="view_work_report_tree" model="ir.ui.view">
+            <field name="name">work.report.tree</field>
+            <field name="model">work.report</field>
+            <field name="arch" type="xml">
+                <tree string="Work Reports" default_order="date desc">
+                    <field name="name"  string="Código"/>
+                    <field name="title" string="Título"/>
+                    <field name="area_id"/>
+                    <field name="user_id"/>
+                    <field name="date"/>
+                    <field name="submission_time"/>
+                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'sent'"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_work_report_kanban" model="ir.ui.view">
+            <field name="name">work.report.kanban</field>
+            <field name="model">work.report</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="o_kanban_small_column_labels o_kanban_project_tasks">
+                    <field name="name"/>
+                    <field name="title"/>
+                    <field name="area_id"/>
+                    <field name="user_id"/>
+                    <field name="date"/>
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click oe_kanban_card d-flex flex-column justify-content-between row-gap-2 shadow-sm rounded border-start border-4 #{record.state.raw_value == 'sent' ? 'border-success' : 'border-info'}">
+                                <div class="oe_kanban_content">
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title" style="font-size: 15px;"><field name="title"/></strong>
+                                        </div>
+                                        <span class="badge rounded-pill text-bg-light border text-muted"><field name="name"/></span>
+                                    </div>
+                                    <div class="o_kanban_record_body mt-1 text-mutedSmall">
+                                        <i class="fa fa-briefcase me-1"/> <field name="area_id"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                                    <div class="text-muted small">
+                                        <i class="fa fa-calendar me-1"/> <field name="date"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="user_id" widget="many2one_avatar_user"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="view_work_report_calendar" model="ir.ui.view">
+            <field name="name">work.report.calendar</field>
+            <field name="model">work.report</field>
+            <field name="arch" type="xml">
+                <calendar string="Calendario de Reportes" date_start="date" color="user_id" quick_add="False">
+                    <field name="title"/>
+                    <field name="name"/>
+                    <field name="area_id"/>
+                </calendar>
+            </field>
+        </record>
+
+
+        <record id="view_work_report_form" model="ir.ui.view">
+            <field name="name">work.report.form</field>
+            <field name="model">work.report</field>
+            <field name="arch" type="xml">
+                <form string="Work Report">
+                    <header>
+                        <button name="action_send" 
+                                string="Enviar" 
+                                type="object" 
+                                class="oe_highlight" 
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        
+                        <button name="action_save_draft" 
+                                string="Guardar Borrador" 
+                                type="object" 
+                                class="btn-secondary" 
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent"/>
+                    </header>
+                    
+                    <sheet>
+                        <div class="oe_title">
+                            <span class="o_field_widget o_readonly">
+                                <field name="name" readonly="1"/>
+                            </span>
+                            <h1>
+                                <field name="title"
+                                       placeholder="Título del reporte…"
+                                       attrs="{'readonly': [('state', '=', 'sent')]}"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group string="Información">
+                                <field name="area_id" attrs="{'readonly': [('state', '=', 'sent')]}"/>
+                                <field name="user_id"/>
+                                <field name="date"/>
+                            </group>
+                            <group string="Registro">
+                                <field name="submission_time"/>
+                            </group>
+                        </group>
+
+                        <separator string="Detalles del Reporte"/>
+                        <field
+                            name="message"
+                            placeholder="Escribe aquí tu reporte del día..."
+                            nolabel="1"
+                            rows="20"
+                            attrs="{'readonly': [('state', '=', 'sent')]}"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_work_report_search" model="ir.ui.view">
+            <field name="name">work.report.search</field>
+            <field name="model">work.report</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Reportes">
+                    <field name="title"   string="Título"/>
+                    <field name="area_id" string="Área"/>
+                    <field name="user_id" string="Usuario"/>
+                    <field name="name"    string="Código"/>
+
+                    <filter name="filter_today"
+                            string="Hoy"
+                            domain="[('date','=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="filter_week"
+                            string="Esta semana"
+                            domain="[('date','&gt;=', (context_today() - relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
+                    <filter name="filter_month"
+                            string="Este mes"
+                            domain="[('date','&gt;=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-%d'))]"/>
+                    <filter name="filter_my"
+                            string="Mis reportes"
+                            domain="[('user_id','=', uid)]"/>
+
+                    <separator/>
+
+                    <group string="Agrupar por">
+                        <filter name="group_area"
+                                string="Área"
+                                context="{'group_by': 'area_id'}"/>
+                        <filter name="group_date"
+                                string="Fecha"
+                                context="{'group_by': 'date'}"/>
+                        <filter name="group_user"
+                                string="Usuario"
+                                context="{'group_by': 'user_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="action_work_report" model="ir.actions.act_window">
+            <field name="name">Work Reports</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">work.report</field>
+            <field name="view_mode">tree,kanban,calendar,form</field>
+            <field name="search_view_id" ref="view_work_report_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Envía tu primer reporte de trabajo.
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_work_report_root"
+                  name="Work Report"
+                  sequence="10"/>
+
+        <menuitem id="menu_work_report_content"
+                  name="Reportes"
+                  parent="menu_work_report_root"
+                  sequence="10"/>
+
+        <menuitem id="menu_work_report_action"
+                  name="Mis Reportes"
+                  parent="menu_work_report_content"
+                  action="action_work_report"
+                  sequence="10"/>
+
+        <menuitem id="menu_work_report_config"
+                  name="Configuración"
+                  parent="menu_work_report_root"
+                  sequence="90"/>
+
+        <menuitem id="menu_work_area_action"
+                  name="Áreas de Trabajo"
+                  parent="menu_work_report_config"
+                  action="action_work_area"
+                  sequence="10"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_work_area_all,work.area.all,model_work_area,,1,0,0,0
+access_work_area_manager,work.area.manager,model_work_area,base.group_system,1,1,1,1
+access_work_report_all,work.report.all,model_work_report,,1,1,1,0
+access_work_report_manager,work.report.manager,model_work_report,base.group_system,1,1,1,1
